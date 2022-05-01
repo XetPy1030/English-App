@@ -1,36 +1,38 @@
+import tkinter as tk
+from tkinter import messagebox
 
-import sys
-from PyQt5.QtWidgets import (QWidget, QToolTip,
-    QPushButton, QApplication)
-from PyQt5.QtGui import QFont
+from PIL import Image, ImageTk
 
+from click import command
 
-class Example(QWidget):
+def search():
+    print("button {}".format(search_text.get()))
 
-    def __init__(self):
-        super().__init__()
+def test_button(event: tk.Event):
+    messagebox.showinfo("Перевод", event.widget.cget("text"))
+    print(event.widget.cget("text"))
 
-        self.initUI()
+window = tk.Tk()
+window.geometry("300x500")
+window.title("Добро пожаловать в приложение PythonRu")
 
+search_text = tk.StringVar()
 
-    def initUI(self):
+#text = tk.Label(window, text="Поиск").grid(row=0)
+input_text = tk.Entry(window, textvariable=search_text).grid(row=0, column=0)
+button = tk.Button(window, text="Поиск", command=search).grid(row=0, column=1)
 
-        QToolTip.setFont(QFont('SansSerif', 10))
+t = tk.Label(window, text="test")
+t.grid(row=1, column=0)
+t.bind("<Button-1>", test_button)
+#b = tk.Button(window, text="GO")
+#b.grid(row=2, column=1)
+#b.bind("<Button-1>", test_button)
 
-        self.setToolTip('This is a <b>QWidget</b> widget')
+image = Image.open("./photos/test.png")
+image.thumbnail((100, 100))
+test_img = ImageTk.PhotoImage(image)
+l_img = tk.Label(image=test_img)
+l_img.grid(row=1, column=1)
 
-        btn = QPushButton('Button', self)
-        btn.setToolTip('This is a <b>QPushButton</b> widget')
-        btn.resize(btn.sizeHint())
-        btn.move(50, 50)
-
-        self.setGeometry(300, 300, 300, 200)
-        self.setWindowTitle('Tooltips')
-        self.show()
-
-
-if __name__ == '__main__':
-
-    app = QApplication(sys.argv)
-    ex = Example()
-    sys.exit(app.exec_())
+window.mainloop()
