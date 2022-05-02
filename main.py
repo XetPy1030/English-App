@@ -75,6 +75,7 @@ window.title(config.app_name)
 
 def testt():
     print("wd")
+    window.destroy()
 window.protocol("WM_DELETE_WINDOW", testt)
 
 search_text = tk.StringVar()
