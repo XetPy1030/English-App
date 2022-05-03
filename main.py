@@ -18,7 +18,8 @@ def convert(filename: str) -> list:
         words.append(word)
     return words
 
-words = convert("words.xlsx")
+all_words = convert("words.xlsx")
+words = all_words
 
 def click_word(event: tk.Event):
     newWindow = tk.Toplevel(window)
@@ -44,24 +45,42 @@ def set_words(words: list, window: tk.Tk, start_row: int = 2):
             except:
                 pass
 
-def search():
-    print("button {}".format(search_text.get()))
+def search_click():
+    global search_text, all_words, set_words_list, window
+
+    text = search_text.get()
+
+    if not text:
+        return
+
+    new_words = search(text, all_words)
+
+    set_words_list(new_words, window)
+
+def search(search_text: str, words: list):
+    searched_word = []
+    search_text = search_text.lower()
+
+    for i in words:
+        for o in config.search_in:
+            if search_text in i[o].lower():
+                searched_word.append(i)
+    
+    return searched_word
 
 def test_button(event: tk.Event):
     messagebox.showinfo("Перевод", event.widget.cget("text"))
     print(event.widget.cget("text"))
 
 def select_word(event: tk.Event):
+    global newWindow, newWindowText
+
+    newWindow.deiconify()
+
     word = my_list.get(tk.ANCHOR)
     info = get_info_from_word(word, words)
 
-    newWindow = tk.Toplevel(window)
-
-    labelExample = tk.Label(newWindow, text=config.info.format(word=info["Word"], translate=info["Translate"], other=info["Other"].replace("nan", config.not_found)))
-    buttonExample = tk.Button(newWindow, text = "New Window button")
-
-    labelExample.pack()
-    buttonExample.pack()
+    newWindowText.set(config.info.format(word=info["Word"], translate=info["Translate"], other=info["Other"].replace("nan", config.not_found)))
 
 def get_info_from_word(word: str, words: list):
     for i in words:
@@ -73,18 +92,10 @@ window = tk.Tk()
 window.geometry(config.app_size)
 window.title(config.app_name)
 
-def testt():
-    print("wd")
-    window.destroy()
-window.protocol("WM_DELETE_WINDOW", testt)
-
 search_text = tk.StringVar()
 
-#text = tk.Label(window, text="Поиск").grid(row=0)
 input_text = tk.Entry(window, textvariable=search_text).grid(row=0, column=0)
-button = tk.Button(window, text=config.button_search, command=search).grid(row=0, column=1)
-
-#set_words(words, window)
+button = tk.Button(window, text=config.button_search, command=search_click).grid(row=0, column=1)
 
 my_list = Listbox(window, width=40)
 my_list.grid(row=1, column=0)
@@ -92,6 +103,8 @@ my_list.bind('<<ListboxSelect>>', select_word)
 
 def set_words_list(words: list, window: tk.Tk):
     global my_list
+
+    my_list.delete(0, tk.END)
 
     for i in range(len(words)):
         my_list.insert(i+1, words[i]["Word"])
@@ -110,5 +123,15 @@ image.thumbnail((100, 100))
 test_img = ImageTk.PhotoImage(image)
 l_img = tk.Label(image=test_img)
 l_img.grid(row=1, column=1)"""
+
+def closeNewWindow():
+    global newWindow
+    newWindow.withdraw()
+
+newWindow = tk.Toplevel(window)
+newWindow.protocol("WM_DELETE_WINDOW", closeNewWindow)
+newWindowText = tk.StringVar()
+newWindowLabel = tk.Label(newWindow, textvariable=newWindowText)
+newWindowLabel.pack()
 
 window.mainloop()
